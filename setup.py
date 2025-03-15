@@ -61,10 +61,11 @@ def replace_line_in_file(filename, pattern, replacement):
     except FileNotFoundError:
         print_log(f"❌ File tidak ditemukan: {filename}", "error")
 
-def configure_files(python_path, log_dir, flask_port):
+def configure_files(python_path, log_dir, flask_port, device_id):
     """Mengedit file konfigurasi dengan parameter yang diberikan."""
     print_log("🛠️ Mengonfigurasi file...")
     replace_line_in_file("billacceptor.py", r'LOG_DIR = .*', f'LOG_DIR = "{log_dir}"')
+    replace_line_in_file("billacceptor.py", r'ID_DEVICE = .*', f'ID_DEVICE = "{device_id}"')
     replace_line_in_file("billacceptor.py", r'app.run\(host="0.0.0.0", port=.*', f'app.run(host="0.0.0.0", port={flask_port}, debug=False, use_reloader=False)')
     replace_line_in_file("billacceptor.service", r'ExecStart=.*', f'ExecStart=/usr/bin/python3 {python_path}/billacceptor.py')
 
@@ -111,6 +112,9 @@ if __name__ == "__main__":
     print("\n🔧 **Setup Bill Acceptor**\n")
 
     # **Input dari pengguna**
+    device_id = input("Masukkan ID Device: ")
+    write_setup_log(setup_log_file, f"ID_DEVICE: {device_id}")
+
     python_path = input("Masukkan path penyimpanan billacceptor.py: ")
     ensure_directory_exists(python_path)
     write_setup_log(setup_log_file, f"Python Path: {python_path}")
@@ -128,7 +132,7 @@ if __name__ == "__main__":
 
     # **Jalankan semua fungsi**
     install_dependencies()
-    configure_files(python_path, log_dir, flask_port)
+    configure_files(python_path, log_dir, flask_port, device_id)
     move_files(python_path, rollback_path)
     configure_ufw(flask_port)
     enable_service()

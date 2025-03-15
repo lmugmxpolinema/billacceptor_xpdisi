@@ -42,6 +42,8 @@ def read_setup_log(log_path):
                 config["flask_port"] = line.split(":")[1].strip()
             elif "VPN Log Path:" in line:
                 config["vpn_log"] = line.split(":")[1].strip()
+            elif "ID_DEVICE:" in line:
+                config["id_device"] = line.split(":")[1].strip()
     return config
 
 def uninstall_dependencies():
@@ -55,6 +57,7 @@ def uninstall_dependencies():
     for dep in dependencies:
         run_command(dep)
     print_log("✅ Semua dependensi telah dihapus.")
+
 def remove_files(python_path, log_dir, vpn_log):
     """Menghapus file konfigurasi, logs, dan service."""
     print_log("🗑️ Menghapus file konfigurasi dan logs...")
