@@ -12,7 +12,7 @@ EN_PIN = 15
 ID_DEVICE = "bic01"
 
 # Konfigurasi transaksi
-TIMEOUT = 20
+TIMEOUT = 180
 DEBOUNCE_TIME = 0.05
 TOLERANCE = 2
 MAX_RETRY = 0 
