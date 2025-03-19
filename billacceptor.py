@@ -4,6 +4,8 @@ import datetime
 import os
 import requests
 from flask import Flask, request, jsonify
+import psutil
+import subprocess
 import threading
 
 # Konfigurasi PIN GPIO
@@ -29,9 +31,9 @@ PULSE_MAPPING = {
 }
 
 # API URL
-TOKEN_API = f"https://api-dev.xpdisi.id/invoice/device/{ID_DEVICE}"
-INVOICE_API = "https://api-dev.xpdisi.id/invoice/"
-BILL_API = "https://api-dev.xpdisi.id/order/billacceptor"
+TOKEN_API = f"https://app.xpdisi.id/api/invoice/device/{ID_DEVICE}"
+INVOICE_API = "https://app.xpdisi.id/api/invoice/"
+BILL_API = "https://app.xpdisi.id/api/order/billacceptor"
 
 # Lokasi penyimpanan log transaksi
 LOG_DIR = "/var/www/html/logs"
@@ -275,6 +277,42 @@ def reset_transaction():
     insufficient_payment_count = 0  
     pending_pulse_count = 0  
     log_transaction("🔄 Transaksi di-reset ke default.")
+
+@app.route('/api/system_stats', methods=['GET'])
+def get_system_stats():
+    cpu_percent = psutil.cpu_percent(interval=1)
+    
+    mem = psutil.virtual_memory()
+    ram_percent = mem.percent
+    ram_total = round(mem.total / (1024 ** 3), 2)
+    ram_used = round(mem.used / (1024 ** 3), 2)
+    
+    disk = psutil.disk_usage('/')
+    disk_percent = disk.percent
+    disk_total = round(disk.total / (1024 ** 3), 2)
+    disk_used = round(disk.used / (1024 ** 3), 2)
+
+    try:
+        output = subprocess.check_output(["vcgencmd", "measure_temp"]).decode("utf-8")
+        temperature = float(output.split("=")[1].split("'")[0])  # Convert to float
+    except Exception as e:
+        temperature = None
+    
+    return jsonify({
+        "cpu": cpu_percent,
+        "ram": {
+            "percent": ram_percent,
+            "used": ram_used,
+            "total": ram_total
+        },
+        "disk": {
+            "percent": disk_percent,
+            "used": disk_used,
+            "total": disk_total
+        },
+        "temperature": temperature
+    })
+
 
 @app.route('/api/status', methods=['GET'])
 def get_bill_acceptor_status():
