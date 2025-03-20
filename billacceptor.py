@@ -297,6 +297,12 @@ def get_system_stats():
         temperature = float(output.split("=")[1].split("'")[0])  # Convert to float
     except Exception as e:
         temperature = None
+
+    uptime_seconds = time.time() - psutil.boot_time()
+    uptime_hours = int(uptime_seconds // 3600)
+    uptime_minutes = int((uptime_seconds % 3600) // 60)
+    uptime_seconds = int(uptime_seconds % 60)
+    uptime_pi = f"{uptime_hours}h {uptime_minutes}m {uptime_seconds}s"
     
     return jsonify({
         "cpu": cpu_percent,
@@ -310,7 +316,8 @@ def get_system_stats():
             "used": disk_used,
             "total": disk_total
         },
-        "temperature": temperature
+        "temperature": temperature,
+        "uptime" : uptime_pi
     })
 
 
