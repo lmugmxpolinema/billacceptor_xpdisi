@@ -45,7 +45,6 @@ if not os.path.exists(LOG_DIR):
 # Inisialisasi Flask
 app = Flask(__name__)
 
-
 # Variabel Global
 pulse_count = 0
 pending_pulse_count = 0
@@ -132,9 +131,9 @@ def send_transaction_status():
 
                 if insufficient_payment_count >= MAX_RETRY:
                     log_transaction("🚫 Pembayaran kurang melebihi batas! Transaksi dibatalkan.")
-                    transaction_active = False  # Matikan transaksi
-                    pi.write(EN_PIN, 0)  # Bill acceptor dinonaktifkan
-                    reset_transaction()  # Reset hanya jika max retry tercapai
+                    transaction_active = False  
+                    pi.write(EN_PIN, 0)  
+                    reset_transaction()  
                 else:
                     log_transaction(f"🔄 Pembayaran kurang, percobaan {insufficient_payment_count}/{MAX_RETRY}. Silakan lanjutkan memasukkan uang...")
                     
@@ -324,7 +323,6 @@ def get_system_stats():
         "uptime" : uptime_pi
     })
 
-
 @app.route('/api/status', methods=['GET'])
 def get_bill_acceptor_status():
     global transaction_active
@@ -364,7 +362,6 @@ def trigger_transaction():
                         payment_token = token_data["PaymentToken"]
                         log_transaction(f"✅ Token ditemukan: {payment_token}, umur: {age_in_minutes:.2f} menit")
 
-                        # Ambil detail invoice berdasarkan paymentToken
                         invoice_response = requests.get(f"{INVOICE_API}{payment_token}", timeout=5)
                         invoice_data = invoice_response.json()
 
