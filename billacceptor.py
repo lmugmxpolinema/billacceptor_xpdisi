@@ -294,15 +294,19 @@ def get_system_stats():
 
     try:
         output = subprocess.check_output(["vcgencmd", "measure_temp"]).decode("utf-8")
-        temperature = float(output.split("=")[1].split("'")[0])  # Convert to float
+        temperature = float(output.split("=")[1].split("'")[0])
     except Exception as e:
         temperature = None
 
     uptime_seconds = time.time() - psutil.boot_time()
-    uptime_hours = int(uptime_seconds // 3600)
+    uptime_days = int(uptime_seconds // 86400)
+    uptime_hours = int((uptime_seconds % 86400) // 3600)
     uptime_minutes = int((uptime_seconds % 3600) // 60)
     uptime_seconds = int(uptime_seconds % 60)
-    uptime_pi = f"{uptime_hours}h {uptime_minutes}m {uptime_seconds}s"
+    if uptime_days > 0:
+        uptime_pi = f"{uptime_days}d {uptime_hours}h {uptime_minutes}m {uptime_seconds}s"
+    else:
+        uptime_pi = f"{uptime_hours}h {uptime_minutes}m {uptime_seconds}s"
     
     return jsonify({
         "cpu": cpu_percent,
