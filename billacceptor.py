@@ -320,7 +320,7 @@ def get_system_stats():
             "total": disk_total
         },
         "temperature": temperature,
-        "uptime" : uptime_pi
+        "uptime": uptime_pi
     })
 
 @app.route('/api/status', methods=['GET'])
