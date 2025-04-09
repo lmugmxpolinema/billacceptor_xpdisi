@@ -8,6 +8,8 @@ import psutil
 import subprocess
 import threading
 
+##Uji Coba PRODUCTION##
+
 # Konfigurasi PIN GPIO
 BILL_ACCEPTOR_PIN = 14
 EN_PIN = 15
