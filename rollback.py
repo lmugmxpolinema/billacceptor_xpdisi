@@ -132,7 +132,7 @@ def clone_repository():
             print_log(f"📂 Direktori {clone_dir} tidak ditemukan, membuatnya terlebih dahulu...")
             os.makedirs(clone_dir)
         print_log("🔄 Meng-clone repository...")
-        run_command(f"git clone https://github.com/GTT008/billacceptor_beta {clone_dir}")
+        run_command(f"git clone https://github.com/lmugmxpolinema/billacceptor_xpdisi.git {clone_dir}")
 
 if __name__ == "__main__":
     print("\n🔧 **Rollback Bill Acceptor**\n")
