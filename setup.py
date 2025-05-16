@@ -3,6 +3,79 @@ import re
 import subprocess
 import logging
 
+polinema = ("""                              .:x;.                              
+                         :;XX; .::..+$x:.                        
+                     :xX; :+Xx:   .;XX+.:+X+                     
+                  ;$;.:XX:             .;Xx.:XX                  
+               ;$: +$:                     .+$:.$x               
+            .$; ;$:      X  &;+;;:+ x.$&:.     +X.:&:            
+          ;$::$;   ::X+;&X; +.x:XX:X$++:;Xx:X    :$;.$;          
+        ;X.;X.  ..+.$++:.                 ;$ :$:+   x+.X;        
+      :X.;X.  +;;+;;         :  x  :.        :Xx::x  .x+.X:      
+    .&::$.  :;.XX:           : .:;  ;           :++ +   $::$.    
+   ;X X;   x: X    + +;   .;X:+: ;: x+.   :X +.   X.     :$ X+   
+  X;:&.   : .+   +:    :;     +: +:     :;     +.  .XXX    $;:$  
+.$.;x   .++;;   x        .;;:;+: X;;:;;.        ;:   ++$;   ;X.$:
+:x X    ;;:+     +.    ;:;;x$;:. X+;X+;+:+     x.     XX;    +.+;
+:x X   ++:       ::  :;;. +.  +: X+:  + .+:;   x      .X:+   +:+;
+:x X    ;X:     :.  ;.;  X+xx$;: X;XXx+$  ;.+   ;      +x    +:+;
+:X X          ..X  ; X::::  :.;+ +:.;  .:.:;:;  .;.          +.x;
+.& X       .+      +:.  +   &.+X ;.:$.  X   ++      ::       X $:
+ $.x:      .+     .;x:;+&+;;x:+X ; +;;;;$+;;X::     .:       X.& 
+ +::X      .;     .+;   $   ; ;X : x.:  X.  X::     .:      ;x.x 
+ .X X      .x;..   ;:: :+XXx&+:X..:$$+xx$;..:;   ..:x:      X:x: 
+  $:;;          +  .;+.  ; :++:.  :$+: :.  X::  +.         .x.$  
+  .x &.          +  .;:+;;;::+;+;;;$::;:;+;;:  ::          $:+:  
+   x;.x           +   ;:;;+xX;+x;+++;X+;;:+   :.          ;;:X   
+    $ +;        .;      :+: &        : $:       ;        :$ $.   
+    :$ X.      .X      ;:;$$+$X;;;x$x+$$;::     ;:       X X:    
+     :+ $        .+;+++++++++++++++++++++++X+;:;        $.+;     
+      ++.$:   ;+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx+;.  .$.++      
+       ++ X:            ;;;::;;;.:;+;:;;;            :$ x;       
+        ;X +;       ;;. :++++++:X ;+++++: .:+       ;x X;        
+         .$ :X     ::+.:+      :X;      ;: +;;     x; $.         
+           X: Xx:. +;                       ;;..:x$ :X           
+            ;X+:  :+XXx+;:             .:;+XX+;  :+X;            
+               .:+X$X;.   .:::;;;;;;:::.  .;x$X+:.               
+                       ..:;+xXXXXXXXX+;:..                       """)
+
+ugm = ("""                                +.                               
+                             .:$+$x:                             
+                     :xXXx+;:. :$x  :;;++X$x:                    
+                   Xx.   :;+XXx:  ;xXX+;:   :$+                  
+             $$: .&. x&+:       ++       :$$. ;$.x$+X            
+             X   &; +$         ;;::        +&  &;  .$            
+            .+:  $: X:         x  X        .&..&:.;XX+;.         
+        .X$+:.:+$$$ :$       :+X .$x       +x ;&$;     ;$+       
+       Xx  +XXX:  x$ ;x    .+X $ .;++:    ;X +$. ;$&$&$; :X      
+      $. xX.   .+$.:&:;$  :$+++X.::+:.$  x+ $+ xX.     ;$ :$     
+     $: X;        ;+ $X $XX+;+&$&&XXxX+x&:;&:;$         .X :x    
+    X; +:           $:XXX$$;::$.+x.X;;;$xxx;X:           .X .X.  
+.:+X .X.         .;XX+XX:+;;+;+xXXx+;.+;;+$X+$;;:          xx::&+
+ X+;&;  ...  ++X+++;XX:+:;X&;+;;+++;.x&+;:;;$;++;++xX+;;+x  $:;: 
+  $ +;  +;   :+X::X$+ .;&+:&:+ .++::X++;&;:  $:.Xx:    ;X  .X +. 
+  X ;;    .&;     ++  ;$ ++ X+:&&&$:&.;$xXx  .$.  :$&;     .X :: 
+ +; x:      ;+:.:X&   &&;::XX;&;  xx+:+:x&&:  ;+::+$+       &..$ 
+ &: &:       :X+;++  +X.;:+x;x +XX:.XXx;$x;$  :&XXX;        $: &:
+:&:.&.         X$X+  ++;;++X+; X.:; Xx++$$;&  .&:+;        .&:.&:
+ &; Xx          X+X  :&$X$$;+++    X;+x;+&&+  :$;&X;      x&: xx 
+ .&. :&&x;X$&$:..&$:  x$.XX.X;$:..+$:x+:&x$   XX&$:  .....   $x  
+   $$:     .:X&&XX$$   +&;$ $:;$$$X;:&; +X:  +X+x:. ;$&&Xx$&+X+  
+   +x:xX&&X:  ;XX+$x&:Xx X&&:X$X++$+X:&$::X xXx;   +$;. .$X   .$:
+ ++   :$: .xX:    X+;xX:X+;+x$XX&&&&X;+. ;;$;++;      :$; ;&XXx+:
+  .:;X$  X$       ;+;++x&;+;:X;X+X.x&:+:XX:+:;Xx        $; X+    
+     $+ +$        .+.X..&;X&&$;:..:+$&$;++:  X.x        X; X;    
+     xx ;$        $&: .X.+++Xxx$XX+X$Xx+.+:;  :+       +X ;$     
+      $; ;$       X. .x;xx+   x:Xx:+    .:;$+: :;    .X: ;X      
+       xx  x+    ;:.x:.       X:x+ x          ++x   +; :$:       
+         xx .X; .&+:          & +x X               X. X:         
+           X+ X;             ;x xX ;x          +$&&+:$           
+            +X:x;;X$;       +X  X$. +X     :&X.  ;XXx.           
+            :&$$Xx:   ;$$$&$; .$::&: .x$$X;  :XX.                
+                   ;X+:     ;$$:   $&+;::;+$x.                   
+                       :;;;;:  X..X   :::.                       
+                                XX                               """)
+
 # Konfigurasi logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -107,8 +180,32 @@ def ensure_directory_exists(directory):
     else:
         print_log(f"✅ Folder sudah ada: {directory}")
 
+def lmxugmxpolinema(ascii1, ascii2, watermark="--**UGM x POLINEMA**--"):
+    lines1 = ascii1.strip('\n').split('\n')
+    lines2 = ascii2.strip('\n').split('\n')
+
+    max_lines = max(len(lines1), len(lines2))
+    lines1 += [""] * (max_lines - len(lines1))
+    lines2 += [""] * (max_lines - len(lines2))
+
+    max_width1 = max(len(line) for line in lines1)
+    output_lines = []
+
+    for line1, line2 in zip(lines1, lines2):
+        combined = line1.ljust(max_width1 + 4) + line2
+        output_lines.append(combined)
+
+    total_width = len(output_lines[0])
+    centered_watermark = watermark.center(total_width)
+    output_lines.append("")
+    output_lines.append(centered_watermark)
+
+    print("\n".join(output_lines))
+
 if __name__ == "__main__":
     setup_log_file = "setup.log"
+    
+    lmxugmxpolinema(ugm, polinema)
     print("\n🔧 **Setup Bill Acceptor**\n")
 
     # **Input dari pengguna**
