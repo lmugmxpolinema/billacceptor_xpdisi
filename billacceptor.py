@@ -150,6 +150,7 @@ def send_transaction_status():
                     log_trans("🚫 Pembayaran kurang melebihi batas! Transaksi dibatalkan.")
                     transaction_active = False  
                     pi.write(EN_PIN, 0)  
+                    log_system("🚫 EN PIN MATI")
                     reset_transaction()  
                 else:
                     log_system(f"🔄 Pembayaran kurang, percobaan {insufficient_payment_count}/{MAX_RETRY}. Silakan lanjutkan memasukkan uang...")
@@ -158,6 +159,7 @@ def send_transaction_status():
                     # Pastikan transaction_active tetap berjalan
                     transaction_active = True
                     pi.write(EN_PIN, 1)  # Bill acceptor tetap aktif
+                    log_system(f"EN Diaktifkan (inssufficient)")
                     
                     # Pastikan waktu timeout diperbarui agar tidak langsung reset
                     last_pulse_received_time = time.time()
@@ -224,7 +226,8 @@ def start_timeout_timer():
                     continue
             if (current_time - last_pulse_received_time) >= 2 and total_inserted >= product_price:
                     transaction_active = False
-                    pi.write(EN_PIN, 0)  
+                    pi.write(EN_PIN, 0) 
+                    log_system("🚫 EN PIN MATI") 
 
                     overpaid = max(0, total_inserted - product_price) 
 
@@ -242,6 +245,7 @@ def start_timeout_timer():
                     # imeout tercapai, hentikan transaksi
                     transaction_active = False
                     pi.write(EN_PIN, 0) 
+                    log_system("🚫 EN PIN MATI")
 
                     remaining_due = max(0, product_price - total_inserted)
                     overpaid = max(0, total_inserted - product_price) 
@@ -287,6 +291,7 @@ def process_final_pulse_count():
 
     pending_pulse_count = 0 
     pi.write(EN_PIN, 1)
+    log_system(f"EN Diaktifkan (Correction)")
     with print_lock:
         print("✅ Koreksi selesai, EN_PIN diaktifkan kembali")
 
@@ -403,7 +408,7 @@ def trigger_transaction():
                                 log_system(f"🔔 Transaksi dimulai! ID: {id_trx}, Token: {payment_token}, Tagihan: Rp.{product_price}")
                                 log_trans(f"🔔 Transaksi dimulai! ID: {id_trx}, Token: {payment_token}, Tagihan: Rp.{product_price}")
                                 pi.write(EN_PIN, 1)
-                                log_system(f"EN Diaktifkan")
+                                log_system(f"EN Diaktifkan  (Token)")
                                 threading.Thread(target=start_timeout_timer, daemon=True).start()
                                 return
                             else:
