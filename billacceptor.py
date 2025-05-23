@@ -403,6 +403,7 @@ def trigger_transaction():
                                 log_system(f"🔔 Transaksi dimulai! ID: {id_trx}, Token: {payment_token}, Tagihan: Rp.{product_price}")
                                 log_trans(f"🔔 Transaksi dimulai! ID: {id_trx}, Token: {payment_token}, Tagihan: Rp.{product_price}")
                                 pi.write(EN_PIN, 1)
+                                log_system(f"EN Diaktifkan")
                                 threading.Thread(target=start_timeout_timer, daemon=True).start()
                                 return
                             else:
