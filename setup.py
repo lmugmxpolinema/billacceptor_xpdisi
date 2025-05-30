@@ -107,6 +107,7 @@ def install_dependencies():
         "sudo apt install python3-pip -y",
         "sudo pip3 install flask requests --break-system-packages",
         "sudo pip3 install psutil flask_cors --break-system-packages",
+        "sudo pip3 install python-dotenv --break-system-packages",
         "sudo apt install -y ufw",
         "sudo systemctl start pigpiod",
         "sudo systemctl enable pigpiod"
@@ -115,32 +116,14 @@ def install_dependencies():
         run_command(dep)
     print_log("✅ Semua dependensi telah terinstal.")
 
-def replace_line_in_file(filename, pattern, replacement):
-    """Mengganti baris dalam file berdasarkan pola tertentu."""
-    if not os.path.exists(filename):
-        print_log(f"❌ File tidak ditemukan: {filename}", "error")
-        return  
-    try:
-        with open(filename, "r") as file:
-            lines = file.readlines()
-        
-        with open(filename, "w") as file:
-            for line in lines:
-                if re.search(pattern, line):
-                    file.write(replacement + "\n")
-                else:
-                    file.write(line)
-        print_log(f"✅ Berhasil mengedit file: {filename}")
-    except FileNotFoundError:
-        print_log(f"❌ File tidak ditemukan: {filename}", "error")
-
-def configure_files(python_path, log_dir, flask_port, device_id):
-    """Mengedit file konfigurasi dengan parameter yang diberikan."""
-    print_log("🛠️ Mengonfigurasi file...")
-    replace_line_in_file("billacceptor.py", r'LOG_DIR = .*', f'LOG_DIR = "{log_dir}"')
-    replace_line_in_file("billacceptor.py", r'ID_DEVICE = .*', f'ID_DEVICE = "{device_id}"')
-    replace_line_in_file("billacceptor.py", r'app.run\(host="0.0.0.0", port=.*', f'app.run(host="0.0.0.0", port={flask_port}, debug=False, use_reloader=False)')
-    replace_line_in_file("billacceptor.service", r'ExecStart=.*', f'ExecStart=/usr/bin/python3 {python_path}/billacceptor.py')
+def write_env_file(filename, device_id, token_api, invoice_api, bill_api, log_dir, flask_port):
+    with open(filename, "w") as env_file:
+        env_file.write(f'ID_DEVICE="{device_id}"\n')
+        env_file.write(f'TOKEN_API="{token_api}"\n')
+        env_file.write(f'INVOICE_API="{invoice_api}"\n')
+        env_file.write(f'BILL_API="{bill_api}"\n')
+        env_file.write(f'LOG_DIR="{log_dir}"\n')
+        env_file.write(f'PORT={flask_port}\n')
 
 def move_files(python_path, rollback_path):
     """Memindahkan file ke lokasi yang sesuai."""
@@ -208,15 +191,24 @@ if __name__ == "__main__":
     lmxugmxpolinema(ugm, polinema)
     print("\n🔧 **Setup Bill Acceptor**\n")
 
-    # **Input dari pengguna**
+    # Input dari pengguna
     device_id = input("Masukkan ID Device: ")
     write_setup_log(setup_log_file, f"ID_DEVICE: {device_id}")
+
+    token_api = input("Masukkan URL TOKEN_API: ")
+    write_setup_log(setup_log_file, f"TOKEN_API: {token_api}")
+
+    invoice_api = input("Masukkan URL INVOICE_API: ")
+    write_setup_log(setup_log_file, f"INVOICE_API: {invoice_api}")
+
+    bill_api = input("Masukkan URL BILL_API: ")
+    write_setup_log(setup_log_file, f"BILL_API: {bill_api}")
 
     python_path = input("Masukkan path penyimpanan billacceptor.py: ")
     ensure_directory_exists(python_path)
     write_setup_log(setup_log_file, f"Python Path: {python_path}")
 
-    log_dir = python_path  
+    log_dir = python_path
     print_log(f"📁 LOG_DIR disetel ke: {log_dir}")
     write_setup_log(setup_log_file, f"LOG_DIR: {log_dir}")
 
@@ -227,9 +219,13 @@ if __name__ == "__main__":
     ensure_directory_exists(rollback_path)
     write_setup_log(setup_log_file, f"Rollback Path: {rollback_path}")
 
-    # **Jalankan semua fungsi**
+    # Tulis file .env
+    env_path = os.path.join(python_path, ".env")
+    write_env_file(env_path, device_id, token_api, invoice_api, bill_api, log_dir, flask_port)
+    print_log(f"✅ File .env berhasil dibuat di: {env_path}")
+
+    # Jalankan semua fungsi
     install_dependencies()
-    configure_files(python_path, log_dir, flask_port, device_id)
     move_files(python_path, rollback_path)
     configure_ufw(flask_port)
     enable_service()
