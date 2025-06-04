@@ -144,7 +144,7 @@ def write_env_file(filename, device_id, token_api, invoice_api, bill_api, log_di
         env_file.write(f'LOG_DIR="{log_dir}"\n')
         env_file.write(f'PORT={flask_port}\n')
 
-def configure_files(python_path, log_dir, flask_port, device_id):
+def configure_files(python_path):
     """Mengedit file konfigurasi dengan parameter yang diberikan."""
     print_log("🛠️ Mengonfigurasi file...")
     replace_line_in_file("billacceptor.service", r'ExecStart=.*', f'ExecStart=/usr/bin/python3 {python_path}/billacceptor.py')
