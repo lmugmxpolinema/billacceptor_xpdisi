@@ -104,7 +104,7 @@ def install_dependencies():
     print_log("📦 Menginstal dependensi...")
     dependencies = [
         "sudo apt update && sudo apt upgrade -y",
-        "sudo apt install python3-pip -y --fix-missing",
+        "sudo apt install python3-pip -y",
         "sudo pip3 install flask requests --break-system-packages",
         "sudo pip3 install psutil flask_cors --break-system-packages",
         "sudo pip3 install python-dotenv --break-system-packages",
