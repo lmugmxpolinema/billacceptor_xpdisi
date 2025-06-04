@@ -116,6 +116,25 @@ def install_dependencies():
         run_command(dep)
     print_log("✅ Semua dependensi telah terinstal.")
 
+def replace_line_in_file(filename, pattern, replacement):
+    """Mengganti baris dalam file berdasarkan pola tertentu."""
+    if not os.path.exists(filename):
+        print_log(f"❌ File tidak ditemukan: {filename}", "error")
+        return  
+    try:
+        with open(filename, "r") as file:
+            lines = file.readlines()
+        
+        with open(filename, "w") as file:
+            for line in lines:
+                if re.search(pattern, line):
+                    file.write(replacement + "\n")
+                else:
+                    file.write(line)
+        print_log(f"✅ Berhasil mengedit file: {filename}")
+    except FileNotFoundError:
+        print_log(f"❌ File tidak ditemukan: {filename}", "error")
+
 def write_env_file(filename, device_id, token_api, invoice_api, bill_api, log_dir, flask_port):
     with open(filename, "w") as env_file:
         env_file.write(f'ID_DEVICE="{device_id}"\n')
@@ -124,6 +143,11 @@ def write_env_file(filename, device_id, token_api, invoice_api, bill_api, log_di
         env_file.write(f'BILL_API="{bill_api}"\n')
         env_file.write(f'LOG_DIR="{log_dir}"\n')
         env_file.write(f'PORT={flask_port}\n')
+
+def configure_files(python_path, log_dir, flask_port, device_id):
+    """Mengedit file konfigurasi dengan parameter yang diberikan."""
+    print_log("🛠️ Mengonfigurasi file...")
+    replace_line_in_file("billacceptor.service", r'ExecStart=.*', f'ExecStart=/usr/bin/python3 {python_path}/billacceptor.py')
 
 def move_files(python_path, rollback_path):
     """Memindahkan file ke lokasi yang sesuai."""
@@ -226,6 +250,7 @@ if __name__ == "__main__":
 
     # Jalankan semua fungsi
     install_dependencies()
+    configure_files(python_path)
     move_files(python_path, rollback_path)
     configure_ufw(flask_port)
     enable_service()
