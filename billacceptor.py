@@ -310,6 +310,7 @@ def reset_transaction():
     pending_pulse_count = 0  
     log_system(" Transaksi di-reset ke default.")
 
+# API ENDPOINTS FOR MONITORING SYSTEM STATS
 @app.route('/api/system_stats', methods=['GET'])
 def get_system_stats():
     cpu_percent = psutil.cpu_percent(interval=1)
@@ -356,21 +357,24 @@ def get_system_stats():
         "uptime": uptime_pi
     })
 
-@app.route('/api/status', methods=['GET'])
-def get_bill_acceptor_status():
-    global transaction_active
-    
-    if transaction_active:
+#API ENDPOINTS FOR PAYMENT LOGS
+@app.route('/api/payment_logs', methods=['GET'])
+def get_payment_logs():
+    try:
+        with open(LOG_TRANS, "r") as f:
+            lines = f.readlines()
+            last_lines = lines[-10:] if len(lines) >= 10 else lines
+        return jsonify({
+            "status": "success",
+            "logs": [line.strip() for line in last_lines]
+        }), 200
+    except Exception as e:
         return jsonify({
             "status": "error",
-            "message": "Bill acceptor sedang dalam transaksi"
-        }), 409 
+            "message": f"Gagal membaca log: {e}"
+        }), 500
 
-    return jsonify({
-        "status": "success",
-        "message": "Bill acceptor siap digunakan"
-    }), 200 
-
+#FUNCTION TO TRIGGER A NEW TRANSACTION
 def trigger_transaction():
     global transaction_active, total_inserted, id_trx, payment_token, product_price, last_pulse_received_time, pending_pulse_count
     
